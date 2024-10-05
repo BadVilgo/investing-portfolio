@@ -7,7 +7,7 @@ function StockPrice() {
   useEffect(() => {
     const fetchStockPrice = async () => {
       try {
-        const response = await fetch("http://localhost:5000/scrape");
+        const response = await fetch("/api/scrape");
         const data = await response.json();
 
         if (response.ok) {
