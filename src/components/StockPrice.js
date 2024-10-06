@@ -7,7 +7,8 @@ function StockPrice() {
   useEffect(() => {
     const fetchStockPrice = async () => {
       try {
-        const response = await fetch("/api/scrape");
+        //const response = await fetch("/api/scrape"); //vercel website
+        const response = await fetch("http://localhost:3000/api/scrape"); //local
         const data = await response.json();
 
         if (response.ok) {

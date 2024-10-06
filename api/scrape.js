@@ -5,6 +5,16 @@ module.exports = async (req, res) => {
   try {
     console.log("Starting Puppeteer...");
 
+    // Set CORS headers to allow cross-origin requests
+    res.setHeader("Access-Control-Allow-Origin", "*"); // Allow requests from any origin
+    res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+    res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+
+    // Handle CORS preflight requests
+    if (req.method === "OPTIONS") {
+      return res.status(200).end();
+    }
+
     // Launch Puppeteer
     browser = await puppeteer.launch({
       headless: true, // Set to true for production on Vercel
@@ -24,6 +34,30 @@ module.exports = async (req, res) => {
       waitUntil: "domcontentloaded",
       timeout: 30000, // 30 seconds timeout
     });
+
+    console.log("Handling consent popup if present...");
+    // Wait for the consent button and click it if present
+    try {
+      // Click "Go to end" button if it exists
+      const goToEndButton = await page.$("#scroll-down-btn");
+      if (goToEndButton) {
+        await page.click("#scroll-down-btn");
+        console.log('"Go to end" button clicked.');
+      } else {
+        console.log('"Go to end" button not found.');
+      }
+
+      // Click "Accept all" button if it exists
+      const acceptAllButton = await page.$("button.accept-all");
+      if (acceptAllButton) {
+        await page.click("button.accept-all");
+        console.log('"Accept all" button clicked.');
+      } else {
+        console.log('"Accept all" button not found.');
+      }
+    } catch (err) {
+      console.log("Error clicking buttons:", err);
+    }
 
     console.log("Waiting for the stock price selector...");
     // Wait for the specific selector to load

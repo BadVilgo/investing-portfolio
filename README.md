@@ -1,5 +1,8 @@
-./investing-portfolio/backend
+./investing-portfolio/backend (local server)
 node server.js
+
+./investing-portfolio/(local serverless vercel)
+vercel dev
 
 ./investing-portfolio/
 npm start
