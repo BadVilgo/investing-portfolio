@@ -1,5 +1,6 @@
 {
-  "homepage": "https://BadVilgo.github.io/investing-portfolio",
+  "homepage": "/",
+  "_comment": "homepage: https://BadVilgo.github.io/investing-portfolio, local & github",
   "name": "investing-portfolio",
   "version": "0.1.0",
   "private": true,
