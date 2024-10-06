@@ -19,7 +19,14 @@ module.exports = async (req, res) => {
     browser = await puppeteer.launch(
       process.env.AWS_LAMBDA_FUNCTION_NAME
         ? {
-            args: chromium.args,
+            args: [
+              ...chromium.args,
+              "--no-sandbox",
+              "--disable-setuid-sandbox",
+              "--single-process",
+              "--disable-dev-shm-usage",
+              "--no-zygote",
+            ],
             executablePath: await chromium.executablePath,
             headless: chromium.headless,
           }
