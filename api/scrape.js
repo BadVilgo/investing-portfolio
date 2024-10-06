@@ -1,37 +1,27 @@
-let puppeteer;
-let chromium;
+const chromium = require("@sparticuz/chromium");
+const puppeteer = require("puppeteer-core");
 
-if (process.env.AWS_LAMBDA_FUNCTION_NAME) {
-  // Running in a serverless environment (e.g., Vercel)
-  chromium = require("chrome-aws-lambda");
-  puppeteer = require("puppeteer-core");
-} else {
-  // Running locally
-  puppeteer = require("puppeteer");
-}
+const production = process.env.NODE_ENV === "production";
 
 module.exports = async (req, res) => {
   let browser;
   try {
     console.log("Starting Puppeteer...");
 
-    // Launch Puppeteer
+    // Launch Puppeteer with conditional settings for production and local environments
     browser = await puppeteer.launch(
-      process.env.AWS_LAMBDA_FUNCTION_NAME
+      production
         ? {
-            args: [
-              ...chromium.args,
-              "--no-sandbox",
-              "--disable-setuid-sandbox",
-              "--single-process",
-              "--disable-dev-shm-usage",
-              "--no-zygote",
-            ],
-            executablePath: await chromium.executablePath,
-            headless: chromium.headless,
+            args: chromium.args,
+            defaultViewport: chromium.defaultViewport,
+            executablePath: await chromium.executablePath(),
+            headless: "new", // Use 'new' headless mode for modern Chromium
+            ignoreHTTPSErrors: true,
           }
         : {
-            headless: true, // Use default settings for local environment
+            headless: "new", // Use 'new' headless mode for modern Chromium
+            executablePath:
+              "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome", // Adjust this path for your local environment
           }
     );
 
@@ -54,9 +44,7 @@ module.exports = async (req, res) => {
     });
 
     console.log("Handling consent popup if present...");
-    // Wait for the consent button and click it if present
     try {
-      // Click "Go to end" button if it exists
       const goToEndButton = await page.$("#scroll-down-btn");
       if (goToEndButton) {
         await page.click("#scroll-down-btn");
@@ -65,7 +53,6 @@ module.exports = async (req, res) => {
         console.log('"Go to end" button not found.');
       }
 
-      // Click "Accept all" button if it exists
       const acceptAllButton = await page.$("button.accept-all");
       if (acceptAllButton) {
         await page.click("button.accept-all");
