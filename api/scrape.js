@@ -3,6 +3,19 @@ const puppeteer = require("puppeteer-core");
 
 const production = process.env.NODE_ENV === "production";
 
+const getLocalChromePath = () => {
+  switch (process.platform) {
+    case "win32":
+      return "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe";
+    case "linux":
+      return "/usr/bin/google-chrome";
+    case "darwin": // macOS
+      return "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome";
+    default:
+      throw new Error("Unsupported platform: " + process.platform);
+  }
+};
+
 module.exports = async (req, res) => {
   let browser;
   try {
@@ -15,13 +28,12 @@ module.exports = async (req, res) => {
             args: chromium.args,
             defaultViewport: chromium.defaultViewport,
             executablePath: await chromium.executablePath(),
-            headless: "new", // Use 'new' headless mode for modern Chromium
+            headless: "new",
             ignoreHTTPSErrors: true,
           }
         : {
-            headless: "new", // Use 'new' headless mode for modern Chromium
-            executablePath:
-              "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome", // Adjust this path for your local environment
+            headless: "new",
+            executablePath: getLocalChromePath(), // Use platform-specific executable path
           }
     );
 
